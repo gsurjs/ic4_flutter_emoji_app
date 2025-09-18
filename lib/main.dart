@@ -432,26 +432,26 @@ class EmojiPainter extends CustomPainter {
     final facePaint = Paint()
       ..color = Colors.yellow
       ..style = PaintingStyle.fill;
-    canvas.drawCircle(center, 80, facePaint);
+    canvas.drawCircle(center, 60, facePaint);
 
     // Face border
     final borderPaint = Paint()
       ..color = Colors.orange
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3;
-    canvas.drawCircle(center, 80, borderPaint);
+    canvas.drawCircle(center, 60, borderPaint);
 
     // Fill the left eye
     final leftEyePaint = Paint()
       ..color = Colors.black
       ..style = PaintingStyle.fill;
-    canvas.drawCircle(Offset(center.dx - 25, center.dy - 20), 8, leftEyePaint);
+    canvas.drawCircle(Offset(center.dx - 25, center.dy - 20), 6, leftEyePaint);
 
     // Fill the right eye
     final rightEyePaint = Paint()
       ..color = Colors.black
       ..style = PaintingStyle.fill;
-    canvas.drawCircle(Offset(center.dx + 25, center.dy - 20), 8, rightEyePaint);
+    canvas.drawCircle(Offset(center.dx + 25, center.dy - 20), 6, rightEyePaint);
 
     // Draw the smile (this is an arc)
     final smilePaint = Paint()
@@ -555,40 +555,68 @@ class EmojiPainter extends CustomPainter {
     );
     
     final heartPath = Path();
-    final heartWidth = 120.0;
-    final heartHeight = 100.0;
+    final size = 60.0;
     
-    heartPath.moveTo(center.dx, center.dy + heartHeight * 0.3);
+    // Start at bottom point of heart
+    heartPath.moveTo(center.dx, center.dy + size);
     
-    // Left curve
+    // Left side of heart - curve up to left lobe
     heartPath.cubicTo(
-      center.dx - heartWidth * 0.5, center.dy - heartHeight * 0.1,
-      center.dx - heartWidth * 0.5, center.dy - heartHeight * 0.5,
-      center.dx - heartWidth * 0.2, center.dy - heartHeight * 0.5
+      center.dx - size * 0.6, center.dy + size * 0.3,
+      center.dx - size * 0.9, center.dy - size * 0.1,
+      center.dx - size * 0.5, center.dy - size * 0.5
     );
     
-    // Top left arc
+    // Left lobe - create rounded top
     heartPath.cubicTo(
-      center.dx - heartWidth * 0.1, center.dy - heartHeight * 0.6,
-      center.dx + heartWidth * 0.1, center.dy - heartHeight * 0.6,
-      center.dx + heartWidth * 0.2, center.dy - heartHeight * 0.5
+      center.dx - size * 0.5, center.dy - size * 0.8,
+      center.dx - size * 0.2, center.dy - size * 0.8,
+      center.dx - size * 0.2, center.dy - size * 0.5
     );
     
-    // Right curve
+    // Sharp dip into center valley
+    heartPath.lineTo(center.dx - size * 0.05, center.dy - size * 0.3);
+    heartPath.lineTo(center.dx, center.dy - size * 0.2);
+    heartPath.lineTo(center.dx + size * 0.05, center.dy - size * 0.3);
+    
+    // Right lobe - create rounded top
+    heartPath.lineTo(center.dx + size * 0.2, center.dy - size * 0.5);
     heartPath.cubicTo(
-      center.dx + heartWidth * 0.5, center.dy - heartHeight * 0.5,
-      center.dx + heartWidth * 0.5, center.dy - heartHeight * 0.1,
-      center.dx, center.dy + heartHeight * 0.3
+      center.dx + size * 0.2, center.dy - size * 0.8,
+      center.dx + size * 0.5, center.dy - size * 0.8,
+      center.dx + size * 0.5, center.dy - size * 0.5
+    );
+    
+    // Right side of heart - curve down to bottom point
+    heartPath.cubicTo(
+      center.dx + size * 0.9, center.dy - size * 0.1,
+      center.dx + size * 0.6, center.dy + size * 0.3,
+      center.dx, center.dy + size
     );
     
     heartPath.close();
     
-    final heartRect = Rect.fromCenter(center: center, width: heartWidth, height: heartHeight);
+    final heartRect = Rect.fromCenter(center: center, width: size * 2, height: size * 2);
     final heartPaint = Paint()
       ..shader = heartGradient.createShader(heartRect)
       ..style = PaintingStyle.fill;
     
     canvas.drawPath(heartPath, heartPaint);
+    
+    // Add sparkles around heart
+    final sparklePaint = Paint()
+      ..color = Colors.pink.shade200
+      ..style = PaintingStyle.fill;
+      
+    for (int i = 0; i < 8; i++) {
+      final angle = (i * 2 * pi) / 8;
+      final sparkleRadius = 100;
+      final sparkleX = center.dx + cos(angle) * sparkleRadius;
+      final sparkleY = center.dy + sin(angle) * sparkleRadius;
+      
+      // Draw small circles as sparkles
+      canvas.drawCircle(Offset(sparkleX, sparkleY), 3, sparklePaint);
+    }
   }
 
   @override
